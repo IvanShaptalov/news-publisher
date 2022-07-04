@@ -3,8 +3,6 @@ import datetime
 from aiogram import types, Bot
 from aiogram.types import PhotoSize
 
-from database import models
-
 
 def get_full_user_name(message: types.Message) -> str:
     """get user fullname from message"""

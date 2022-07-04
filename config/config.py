@@ -52,3 +52,6 @@ GROUP_PHOTOS_ID = os.environ.get('PHOTOS_GROUP_ID') or settings['GROUPS']['PHOTO
 
 TOKEN = os.environ.get('TOKEN') or settings['TELEGRAM']['TOKEN']
 TEST_CONFIG = 'ok'  # must be on last line
+
+# commands
+START = '/start'
