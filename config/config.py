@@ -50,4 +50,5 @@ GROUP_MAIN_ID = os.environ.get('MAIN_GROUP_ID') or settings['GROUPS']['MAIN_ID']
 GROUP_EDIT_ID = os.environ.get('EDIT_GROUP_ID') or settings['GROUPS']['EDIT_ID']
 GROUP_PHOTOS_ID = os.environ.get('PHOTOS_GROUP_ID') or settings['GROUPS']['PHOTOS_ID']
 
+TOKEN = os.environ.get('TOKEN') or settings['TELEGRAM']['TOKEN']
 TEST_CONFIG = 'ok'  # must be on last line

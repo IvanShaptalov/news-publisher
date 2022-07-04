@@ -1,7 +1,7 @@
 import datetime
 
 from icecream import ic
-from sqlalchemy import Column, String, ForeignKey, DateTime
+from sqlalchemy import Column, String, DateTime
 
 from config import config
 from database import db_methods
