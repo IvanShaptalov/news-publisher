@@ -27,11 +27,11 @@ def tables_creating(tables_drop):
 @pytest.fixture
 def news(tables_creating) -> News:
     news = News(news_id='19',
-                inner_id=str(uuid.uuid4()),
-                data='some test data in this news',
+                text='text',
+                telegram_news_id='123123',
                 source_title='test title',
                 news_link='https://test_link',
                 source_link='https://test_source_link',
-                description='some test description',
+
                 date=datetime.datetime.now())
     return news

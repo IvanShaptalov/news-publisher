@@ -1,14 +1,14 @@
+import uuid
 from datetime import datetime
 from abc import ABC, abstractmethod
-from pprint import pprint
-from typing import Optional
-
+from babel.dates import parse_date
 import requests
 from bs4 import BeautifulSoup, Tag
 from requests import Response
 
-import config.config
 from config.config import ScrapURLS as SL
+from database.core import db_session
+from database.models import News
 
 
 class Parser(ABC):
@@ -26,9 +26,14 @@ class Parser(ABC):
         pass
 
     @staticmethod
-    def time_formatter(time: datetime, time_format: str):
-        fsd = time.strftime(time_format) if isinstance(time, datetime) else ''  # formatted start date
-        return fsd
+    @abstractmethod
+    def date_to_str(time: datetime, time_format: str, lang: str = None):
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def date_from_str(str_date, time_format: str, lang: str = None):
+        pass
 
     def _get_html_doc(self, url) -> Response:
         self._page = requests.get(url)
@@ -40,116 +45,27 @@ class Parser(ABC):
             self._get_html_doc(url)
         return BeautifulSoup(self._page.text, 'html.parser')
 
-    # region to realize
-    #
-    # def get_title(self) -> str:
-    #     search_area = self.get_div_content(1)
-    #     if search_area and search_area.contents:
-    #         first_s = search_area.contents[0]
-    #         script = first_s.contents[0]
-    #         if isinstance(script, bs4.element.Script):
-    #             str_script = script.__str__()
-    #             title = self.get_value_from_attr_name(src=str_script, attr_key=["offers", "seller", "name"])
-    #             return title
-    #     return ''
-    #
-    # def get_city(self):
-    #     regio = self.soup.find_all('span', attrs={'class': "companyLocation__region--1zzc4"})
-    #
-    #     if len(region) > 0 and region[0].text:
-    #         city = region[0].text
-    #         return city
-    #
-    # def get_phone(self):
-    #     pre_script = self.soup.find_all('script', attrs={'type': 'application/javascript'})
-    #     if len(pre_script) > 0 and pre_script[0].contents:
-    #         if len(pre_script[0].contents) > 0 and pre_script[0].contents[0]:
-    #             script = pre_script[0].contents[0]
-    #             if isinstance(script, bs4.Script):
-    #                 result = self.get_value_with_algorithm(script, "number")
-    #                 phone = result
-    #                 return phone
-    #
-    # def get_seller_link(self):
-    #     search_area = self.get_div_content(1)
-    #     if search_area and search_area.contents:
-    #         first_s = search_area.contents[0]
-    #         script = first_s.contents[0]
-    #         if isinstance(script, bs4.element.Script):
-    #             str_script = script.__str__()
-    #             seller_link = self.get_value_from_attr_name(src=str_script, attr_key=["url"])
-    #             return seller_link
-    #
-    # def get_info(self):
-    #     title = self.get_title()
-    #     city = self.get_city()
-    #     type = 'none'
-    #     phone = self.get_phone()
-    #     seller_link = self.get_seller_link()
-    #     return title, city, type, phone, seller_link
-    #
-    # @staticmethod
-    # def get_value_from_attr_name(src, attr_key: list):
-    #     """@:param src = data to json convert
-    #     @:param attr_key = max deep = 5"""
-    #     step_count = len(attr_key)
-    #     data = json.loads(src)
-    #     result = Nonelinks = soup.flinks = soup.find_all('a', attrs={'class': 'ek-link ek-link_blackhole_full-hover'})ind_all('a', attrs={'class': 'ek-link ek-link_blackhole_full-hover'})
-    #     if step_count == 1:
-    #         result = data[attr_key[0]]
-    #     if step_count == 2:
-    #         result = data[attr_key[0]][attr_key[1]]
-    #     if step_count == 3:
-    #         result = data[attr_key[0]][attr_key[1]][attr_key[2]]
-    #     if step_count == 4:
-    #         result = data[attr_key[0]][attr_key[1]][attr_key[2]][attr_key[3]]
-    #     if step_count == 5:
-    #         result = data[attr_key[0]][attr_key[1]][attr_key[2]][attr_key[3]][attr_key[4]]
-    #     return result
-    #
-    # def get_div_content(self, index):
-    #     divs = None
-    #     try:
-    #         divs = self.soup.find_all('div', attrs={'class': "basePage__content--3L2HZ"})
-    #     except Exception as e:
-    #         ic(type(e), e)
-    #     if divs and len(divs) >= index:
-    #         div = divs[0]
-    #         if div and div.contents:
-    #             return div.contents[0]
-    #
-    # @staticmethod
-    # def get_value_with_algorithm(src: str, key):
-    #     num_index = src.index(key)
-    #
-    #     if num_index > 0:
-    #         src = src[num_index::]
-    #         quote_index = src.index("\"")
-    #         src = src[quote_index + 1::]
-    #         quote_index = src.index("\"")
-    #         src = src[quote_index + 1::]
-    #         last_quote_index = src.index("\"")
-    #         src = src[quote_index:last_quote_index]
-    #         value = src
-    #         return value
-
-
-# endregion to realize
-
 
 class OsvitaParser(Parser):
+    @staticmethod
+    def date_to_str(time: datetime, time_format: str, lang: str = None):
+        pass
+
+    @staticmethod
+    def date_from_str(str_date, time_format: str, lang: str = None):
+        pass
+
     def __init__(self):
         super().__init__(link=SL.OSVITA_URL)
         self._soup = self._soup_from_page(self.main_link)
         self.news_list: list = []
 
     def get_news(self):
-        def get_time(iterate_div):
+        def get_time(iterate_div) -> datetime:
             time = iterate_div.find('span', attrs={'class': 'bdate'})
             if isinstance(time, Tag):
                 if time.text:
-                    return time.text
-            # todo convert to datetime
+                    return parse_date(time.text)
             return None
 
         def get_link(iterate_div):
@@ -186,13 +102,13 @@ class OsvitaParser(Parser):
                         'href': get_link(div),
                         'text': "{0}\n{1}".format(get_title(div),
                                                   get_text(div)),
-
+                        'source_title': 'osvita.ua',
+                        'source_link': self.main_link,
                     }
 
                 if news_item.get('time', None) \
                         and news_item.get('href', None) \
-                        and news_item.get('text', None) \
-                        and news_item.get('title', None):
+                        and news_item.get('text', None):
                     result.append(news_item)
         if result:
             self.news_list = result
@@ -204,24 +120,58 @@ class OsvitaParser(Parser):
 
     def save_news(self, pnews=None):
         r_news = pnews if pnews else self.news_list
-
-        pprint(r_news)
+        with db_session:
+            for news_item in r_news:
+                news_item = News(news_id=str(uuid.uuid4()),
+                                 text=news_item.get('text'),
+                                 source_title=news_item.get('source_title'),
+                                 source_link=news_item.get('source_link'),
+                                 news_link=news_item.get('href'),
+                                 date=news_item.get('time'),
+                                 telegram_news_id='')
+                news_item.save(db_session)
         print('saved')
+        return r_news
 
 
 class NusOrgUaParser(Parser):
+    @staticmethod
+    def date_to_str(time: datetime, time_format: str, lang: str = None):
+        pass
+
+    @staticmethod
+    def date_from_str(str_date, time_format: str, lang: str = None):
+        pass
+
     def __init__(self):
         super().__init__(link=SL.NUSORGUA_URL)
         self._soup = self._soup_from_page(self.main_link)
         self.news_list: list = []
+        self.time_table = {'січня': '1',
+                           'лютого': '2',
+                           'березня': '3',
+                           'квітня': '4',
+                           'травня': '5',
+                           'червня': '6',
+                           'липня': '7',
+                           'серпня': '8',
+                           'вересня': '9',
+                           'жовтня': '10',
+                           'листопада': '11',
+                           'грудня': '12'}
 
     def get_news(self):
         def get_time(iterate_div):
             p_tag = iterate_div.find('p', attrs={'class': 'news_list-item-date'})
             if p_tag and p_tag.text:
-                return p_tag.text
-
+                return from_str_to_date(p_tag.text)
             return None
+
+        def from_str_to_date(str_date: str) -> datetime:
+            for k, v in self.time_table.items():
+                if k in str_date.lower():
+                    res_str_date = str_date.lower().replace(k, v).replace(' ', '.')
+                    return parse_date(res_str_date)
 
         def get_link(iterate_div):
             a_tag = iterate_div.find('a', attrs={'class': 'head'})
@@ -247,7 +197,10 @@ class NusOrgUaParser(Parser):
                     news_item = {
                         'time': get_time(div),
                         'href': get_link(div),
-                        'text': get_text(div)
+                        'text': get_text(div),
+                        'source_title': 'nus.org.ua',
+                        'source_link': self.main_link,
+
                     }
 
                 if news_item.get('time', None) and news_item.get('href', None) and news_item.get('text', None):
@@ -262,16 +215,15 @@ class NusOrgUaParser(Parser):
 
     def save_news(self, pnews=None):
         r_news = pnews if pnews else self.news_list
-
-        pprint(r_news)
+        with db_session:
+            for news_item in r_news:
+                news_item = News(news_id=str(uuid.uuid4()),
+                                 text=news_item.get('text'),
+                                 source_title=news_item.get('source_title'),
+                                 source_link=news_item.get('source_link'),
+                                 news_link=news_item.get('href'),
+                                 date=news_item.get('time'),
+                                 telegram_news_id='')
+                news_item.save(db_session)
         print('saved')
-
-
-if __name__ == '__main__':
-    nus = NusOrgUaParser()
-    news = nus.get_news()
-    nus.save_news()
-
-    osvita = OsvitaParser()
-    news = osvita.get_news()
-    osvita.save_news()
+        return r_news

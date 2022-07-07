@@ -19,7 +19,6 @@ def get_full_user_name(message: types.Message) -> str:
 def retrieve_message_unique_id(message: types.Message, bot: Bot):
     photo = message.photo[0]
     assert isinstance(photo, PhotoSize)
-    # solved send photo.file_id
     photo_file_id = photo.file_id
     return photo_file_id
 

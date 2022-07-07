@@ -22,13 +22,13 @@ class Dictionable:
 class News(Base):
     __tablename__ = 'news'
 
-    news_id = Column('inner_id', String, unique=True, primary_key=True, index=True)
+    news_id = Column('news_id', String, unique=True, primary_key=True, index=True)
     text = Column('text', String, unique=False)
     source_title = Column('source_title', String, unique=False)
     source_link = Column('source_link', String, unique=False)
-    news_link = Column('source_link', String, unique=False)
+    news_link = Column('news_link', String, unique=False)
     date = Column('date', DateTime, unique=False, nullable=True)
-    telegram_news_id = Column('telegram_news_id', String, unique=False, nullable=False)
+    telegram_news_id = Column('telegram_news_id', String, unique=False, default='_')
 
     attrs_to_save = ('news_id',
                      'text',
@@ -73,7 +73,7 @@ class News(Base):
             return False
 
     def __str__(self):
-        return f'{self.date} {self.description}'
+        return f'{self.date} {self.text}'
 
 
 def create_tables(c_engine):
