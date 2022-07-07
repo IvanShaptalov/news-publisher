@@ -22,23 +22,19 @@ class Dictionable:
 class News(Base):
     __tablename__ = 'news'
 
-    inner_id = Column('inner_id', String, unique=True, primary_key=True, index=True)
-    news_id = Column('news_id', String, unique=False)
-    data = Column('data', String, unique=False)
+    news_id = Column('inner_id', String, unique=True, primary_key=True, index=True)
+    text = Column('text', String, unique=False)
     source_title = Column('source_title', String, unique=False)
     source_link = Column('source_link', String, unique=False)
     news_link = Column('source_link', String, unique=False)
-    description = Column('description', String, unique=False)
     date = Column('date', DateTime, unique=False, nullable=True)
     telegram_news_id = Column('telegram_news_id', String, unique=False, nullable=False)
 
     attrs_to_save = ('news_id',
-                     'inner_id',
-                     'data',
+                     'text',
                      'source_title',
-                     'source_link'
+                     'source_link',
                      'news_link',
-                     'description',
                      'date',
                      'telegram_news_id')
 
@@ -49,18 +45,6 @@ class News(Base):
                                                              open_session=open_session)
 
         return result_news
-
-    @staticmethod
-    def paginate(open_session, start_date, end_date, per_page, page_number):
-        raw_news_list = open_session.query(News). \
-            filter(*[News.date >= start_date, News.date <= end_date]) \
-            .limit(per_page). \
-            offset((page_number - 1) * per_page).all()
-
-        news_list = []
-
-        news_list += [news.to_dict(format_date=True) for news in raw_news_list]
-        return news_list
 
     def to_dict(self, format_date=False):
         result = {}

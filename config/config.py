@@ -5,6 +5,7 @@ from pathlib import Path
 
 base_dir = Path(__file__).resolve().parent
 settings = configparser.ConfigParser()
+
 print(base_dir)
 settings.read(os.path.join(base_dir, "config.ini"))
 
@@ -55,3 +56,8 @@ TEST_CONFIG = 'ok'  # must be on last line
 
 # commands
 START = '/start'
+
+
+class ScrapURLS:
+    OSVITA_URL = 'https://osvita.ua/news/'
+    NUSORGUA_URL = 'https://nus.org.ua/news/'

@@ -91,8 +91,7 @@ class VideoSender(BaseSender):
         text = "{}".format(self.prepare_to_send())
 
         await bot.send_message(chat_id=chat_id,
-                                               text=text,
-                                               reply_markup=self.get_answer_markup())
+                               text=text,
+                               reply_markup=self.get_answer_markup())
         await bot.send_video(chat_id=chat_id,
-                                             video=open(path, 'rb'))
-
+                             video=open(path, 'rb'))
