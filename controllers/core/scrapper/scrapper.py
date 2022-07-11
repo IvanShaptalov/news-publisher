@@ -1,12 +1,11 @@
 import uuid
 from datetime import datetime
 from abc import ABC, abstractmethod
-from babel.dates import parse_date
 import requests
 from bs4 import BeautifulSoup, Tag
 from requests import Response
 
-from config.config import ScrapURLS as SL
+from config.config import ScrapURLS as SL, TIME_FORMAT_NUSORGUA, TIME_FORMAT_OSVITA
 from database.core import db_session
 from database.models import News
 
@@ -25,16 +24,6 @@ class Parser(ABC):
     def save_news(self, pnews=None):
         pass
 
-    @staticmethod
-    @abstractmethod
-    def date_to_str(time: datetime, time_format: str, lang: str = None):
-        pass
-
-    @staticmethod
-    @abstractmethod
-    def date_from_str(str_date, time_format: str, lang: str = None):
-        pass
-
     def _get_html_doc(self, url) -> Response:
         self._page = requests.get(url)
         return self._page
@@ -47,14 +36,6 @@ class Parser(ABC):
 
 
 class OsvitaParser(Parser):
-    @staticmethod
-    def date_to_str(time: datetime, time_format: str, lang: str = None):
-        pass
-
-    @staticmethod
-    def date_from_str(str_date, time_format: str, lang: str = None):
-        pass
-
     def __init__(self):
         super().__init__(link=SL.OSVITA_URL)
         self._soup = self._soup_from_page(self.main_link)
@@ -65,7 +46,7 @@ class OsvitaParser(Parser):
             time = iterate_div.find('span', attrs={'class': 'bdate'})
             if isinstance(time, Tag):
                 if time.text:
-                    return parse_date(time.text)
+                    return datetime.strptime(time.text, TIME_FORMAT_OSVITA)
             return None
 
         def get_link(iterate_div):
@@ -135,14 +116,6 @@ class OsvitaParser(Parser):
 
 
 class NusOrgUaParser(Parser):
-    @staticmethod
-    def date_to_str(time: datetime, time_format: str, lang: str = None):
-        pass
-
-    @staticmethod
-    def date_from_str(str_date, time_format: str, lang: str = None):
-        pass
-
     def __init__(self):
         super().__init__(link=SL.NUSORGUA_URL)
         self._soup = self._soup_from_page(self.main_link)
@@ -171,7 +144,7 @@ class NusOrgUaParser(Parser):
             for k, v in self.time_table.items():
                 if k in str_date.lower():
                     res_str_date = str_date.lower().replace(k, v).replace(' ', '.')
-                    return parse_date(res_str_date)
+                    return datetime.strptime(res_str_date, TIME_FORMAT_NUSORGUA)
 
         def get_link(iterate_div):
             a_tag = iterate_div.find('a', attrs={'class': 'head'})

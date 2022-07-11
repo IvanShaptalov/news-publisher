@@ -29,6 +29,7 @@ class News(Base):
     news_link = Column('news_link', String, unique=False)
     date = Column('date', DateTime, unique=False, nullable=True)
     telegram_news_id = Column('telegram_news_id', String, unique=False, default='_')
+    telegram_news_id_edit = Column('telegram_news_id_edit', String, unique=False, default='_')
 
     attrs_to_save = ('news_id',
                      'text',
@@ -36,7 +37,8 @@ class News(Base):
                      'source_link',
                      'news_link',
                      'date',
-                     'telegram_news_id')
+                     'telegram_news_id',
+                     'telegram_news_id_edit')
 
     @staticmethod
     def get_from_db(open_session, news_id):
@@ -44,6 +46,12 @@ class News(Base):
                                                              identifier_to_value=[News.news_id == news_id],
                                                              open_session=open_session)
 
+        return result_news
+
+    @staticmethod
+    def get_from_db_by_datetime(open_session, start_date: datetime, end_date: datetime):
+        result_news1 = open_session.query(News).all()
+        result_news = open_session.query(News).filter(*[News.date >= start_date, News.date <= end_date]).all()
         return result_news
 
     def to_dict(self, format_date=False):
@@ -86,3 +94,4 @@ def drop_tables(c_engine):
     Base.metadata.drop_all(bind=c_engine)
     ic('tables deleted')
     return True
+

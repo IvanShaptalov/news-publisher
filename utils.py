@@ -23,18 +23,6 @@ def retrieve_message_unique_id(message: types.Message, bot: Bot):
     return photo_file_id
 
 
-def try_get_date_from_str(from_date, date_format):
-    # upper_bound date to include current day
-    try:
-        date_from = datetime.datetime.strptime(from_date, date_format)
-        if date_from < datetime.datetime.now():
-            # if start day bigger than end_date raise error
-            raise ValueError()
-    except ValueError as e:
-        return None
-    else:
-        return date_from
-
 
 def get_id_from_data(data: str, index):
     """
@@ -44,16 +32,3 @@ def get_id_from_data(data: str, index):
     """
     assert ':' in data
     return data.split(':')[index]
-
-
-def get_event(callback):
-    pass
-    # event_id = get_id_from_data(callback.data, 1)
-    # event = models.get_from_db_multiple_filter(db.Event, [db.Event.id == event_id])
-    # if isinstance(event, models.Event):
-    #     return event
-
-
-def format_hast(first_chat_id, second_chat_id, event_id):
-    """generate chat_hash"""
-    return f"{first_chat_id}-{second_chat_id}-{event_id}"

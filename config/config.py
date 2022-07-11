@@ -41,6 +41,8 @@ ECHO = str(os.environ.get('DB_ECHO')) == '1' or settings.getboolean(section='DAT
                                                                     option='ECHO')
 
 TIME_FORMAT = '%d.%m.%Y'
+TIME_FORMAT_NUSORGUA = TIME_FORMAT
+TIME_FORMAT_OSVITA = TIME_FORMAT
 
 SLEEPER = str(os.environ.get('SLEEPER')) == '1' or str(settings['SYSTEM']['SLEEPER']) == '1'
 SLEEPER_MINUTES = os.environ.get('SLEEPER_MINUTES') or settings['SYSTEM']['SLEEPER_MINUTES']
@@ -49,13 +51,13 @@ TEST_INTERNET_URL = os.environ.get('TEST_INTERNET_URL') or settings['TEST']['INT
 
 GROUP_MAIN_ID = os.environ.get('MAIN_GROUP_ID') or settings['GROUPS']['MAIN_ID']
 GROUP_EDIT_ID = os.environ.get('EDIT_GROUP_ID') or settings['GROUPS']['EDIT_ID']
-GROUP_PHOTOS_ID = os.environ.get('PHOTOS_GROUP_ID') or settings['GROUPS']['PHOTOS_ID']
 
 TOKEN = os.environ.get('TOKEN') or settings['TELEGRAM']['TOKEN']
 TEST_CONFIG = 'ok'  # must be on last line
 
 # commands
 START = '/start'
+POST = '/post'
 
 
 class ScrapURLS:

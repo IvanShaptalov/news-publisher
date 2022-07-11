@@ -1,15 +1,15 @@
 from aiogram.dispatcher.filters import Text
 
-# from states.service import StatesGroup
 from config import config
-from . import edit_news
-# from . import publish_news
+from . import edit_news, publish_news
 from aiogram import Dispatcher
 
 
 def setup(dp: Dispatcher):
     # in-chat futures
     dp.register_message_handler(edit_news.handle_start, Text(equals=config.START), state='*')
+
+    dp.register_message_handler(publish_news.handle_post_news, Text(equals=config.POST), state='*')
 
     # dp.register_callback_query_handler(edit_news.show_event,
     #                                    lambda callback: config.SHOW_EVENT_MARKER in callback.data, state='*')

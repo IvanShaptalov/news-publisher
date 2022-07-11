@@ -32,6 +32,6 @@ def news(tables_creating) -> News:
                 source_title='test title',
                 news_link='https://test_link',
                 source_link='https://test_source_link',
-
+                telegram_news_id_edit='1231232',
                 date=datetime.datetime.now())
     return news

@@ -1,29 +1,13 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
+from icecream import ic
+
+import config.config
+from .core.news.publisher import NewsPublisher
+from datetime import datetime, timedelta
 
 
-async def send_text_message(message: types.Message, state: FSMContext):  # create class to send all type of data
-    async with state.proxy() as data:
-        event_id = int(data['event_id'])
-        chat_id = data['sender_chat_id']
-        sender = messenger.TextSender(event_id=event_id,
-                                      sender_id=chat_id)
-        await sender.forward_data(message)
-
-
-async def send_photo(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        event_id = int(data['event_id'])
-        chat_id = data['sender_chat_id']
-        sender = messenger.PhotoSender(event_id=event_id,
-                                       sender_id=chat_id)
-        await sender.forward_data(message)
-
-
-async def send_video(message: types.Message, state: FSMContext):
-    async with state.proxy() as data:
-        event_id = int(data['event_id'])
-        chat_id = data['sender_chat_id']
-        sender = messenger.VideoSender(event_id=event_id,
-                                       sender_id=chat_id)
-        await sender.forward_data(message)
+async def handle_post_news(message: types.Message, state: FSMContext):  # post news
+    ic(config.config.POST)
+    await NewsPublisher.publish_event(start_date=datetime.now() - timedelta(days=4),
+                                      end_date=datetime.now() - timedelta(days=3))
