@@ -64,7 +64,7 @@ class News(Base):
 
     def save(self, open_session, identifier_to_value=None):
         if identifier_to_value is None:
-            identifier_to_value = [News.news_id == self.news_id]
+            identifier_to_value = [News.news_link == self.news_link]
         print('write')
         write_obj_to_table(open_session=open_session,
                            table_class=News,
