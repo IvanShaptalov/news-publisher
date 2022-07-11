@@ -1,3 +1,4 @@
+import config.config
 from config.bot_setup import bot
 from database.models import News
 
@@ -28,9 +29,13 @@ class BaseNewsSender:
 
     def prepare_text(self):
         print(self.telegram_news_id)
-        return 'prepared text: {}\n' \
-               'date: {}'.format(self.text, self.date.day
-                                 )
+        return '{0}\n\n' \
+               '{1}\n' \
+               '{2}\n' \
+               '{3}\n'.format(self.source_title,
+                              self.date.strftime(config.config.TIME_FORMAT),
+                              self.text,
+                              self.news_link)
 
     async def post_news(self, group_chat_id):
         await bot.send_message(chat_id=group_chat_id,

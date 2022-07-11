@@ -54,7 +54,7 @@ class OsvitaParser(Parser):
             if isinstance(link, Tag):
                 href = link.get('href')
                 if href:
-                    return self.main_link + href
+                    return self.main_link.replace('/news/', '') + href
             return None
 
         def get_text(iterate_div):
@@ -63,13 +63,6 @@ class OsvitaParser(Parser):
                 return NusOrgUaParser.prepare_text(tag_text.text)
             return None
 
-        def get_title(iterate_div):
-            raw_link = iterate_div.find('a')
-            if isinstance(raw_link, Tag):
-                title = raw_link.get('title', None)
-                if title:
-                    return NusOrgUaParser.prepare_text(title)
-            return None
 
         result = []
         table = self._soup.find('table', attrs={'class': ["gtab", "list"]})
@@ -81,8 +74,7 @@ class OsvitaParser(Parser):
                     news_item = {
                         'time': get_time(div),
                         'href': get_link(div),
-                        'text': "{0}\n{1}".format(get_title(div),
-                                                  get_text(div)),
+                        'text': "{0}".format(get_text(div)),
                         'source_title': 'osvita.ua',
                         'source_link': self.main_link,
                     }
