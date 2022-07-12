@@ -1,4 +1,3 @@
-from icecream import ic
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 from config.config import DB_URL, ECHO, TEST_DB_URL

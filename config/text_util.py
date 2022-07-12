@@ -1,6 +1,15 @@
-from . import config
+# inline keyboard
+EDIT_POST = 'edit'
+DELETE_POST = 'delete'
 
-# event creating
-LINKER_TO_CLIENT = f'Для того, чтобы посмотреть событие перейдите в \n'
 
-MAIN_MENU_OPENED = 'hello aboba'
+# reply keyboard
+TEXT_ENTERED = 'text entered'
+SAVE_POST = 'save'
+CANCEL_EDITING = 'cancel'
+
+
+# main menu
+MAIN_MENU_OPENED = 'enter post command'
+
+

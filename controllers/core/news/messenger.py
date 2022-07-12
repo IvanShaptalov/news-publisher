@@ -1,22 +1,18 @@
 import config.config
+import keyboards
 from config.bot_setup import bot
+from database.core import db_session
 from database.models import News
 
 
 class BaseNewsSender:
     bot = bot
 
-    def __init__(self, news: [dict | News]):
-        if isinstance(news, dict):
-            self.news_id = news.get('news_id', None)
-            self.text = news.get('text', None)
-            self.source_title = news.get('source_title', None)
-            self.source_link = news.get('source_link', None)
-            self.news_link = news.get('news_link', None)
-            self.date = news.get('date', None)
-            self.telegram_news_id = news.get('telegram_news_id', None)
+    def __init__(self, news: News):
+        if news is not None:
+            assert isinstance(news, News)
+            self.news = news
 
-        elif isinstance(news, News):
             self.news_id = news.news_id
             self.text = news.text
             self.source_title = news.source_title
@@ -25,7 +21,7 @@ class BaseNewsSender:
             self.date = news.date
             self.telegram_news_id = news.telegram_news_id
 
-        self.prepared_text = self.prepare_text()
+            self.prepared_text = self.prepare_text()
 
     def prepare_text(self):
         print(self.telegram_news_id)
@@ -38,8 +34,13 @@ class BaseNewsSender:
                               self.news_link)
 
     async def post_news(self, group_chat_id):
-        await bot.send_message(chat_id=group_chat_id,
-                               text=self.prepare_text())
+        message = await bot.send_message(chat_id=group_chat_id,
+                                         text=self.prepare_text())
+
+        with db_session:
+            self.news.telegram_news_id = message.message_id
+            self.news.save(db_session,
+                           identifier_to_value=[News.news_id == self.news.news_id])
         return True
 
     @staticmethod
@@ -48,6 +49,33 @@ class BaseNewsSender:
             print('empty')
             return False
         for news_item in news_list:
-            await news_item.post_news(group_chat_id=group_chat_id)
+            if isinstance(news_item, BaseNewsSender) or isinstance(news_item, EditingNewsSender):
+                await news_item.post_news(group_chat_id=group_chat_id)
 
+        return True
+
+
+class EditingNewsSender(BaseNewsSender):
+    def __init__(self, news: [News]):
+        super().__init__(news)
+
+    def prepare_text(self):
+        print(self.telegram_news_id)
+        return '*POST TO EDITING*\n{0}\n\n' \
+               '{1}\n' \
+               '{2}\n' \
+               '{3}\n'.format(self.source_title,
+                              self.date.strftime(config.config.TIME_FORMAT),
+                              self.text,
+                              self.news_link)
+
+    async def post_news(self, group_chat_id):
+        message = await bot.send_message(chat_id=group_chat_id,
+                                         text=self.prepare_text(),
+                                         reply_markup=keyboards.inline.editing_post_inline_keyboard(self.news_id))
+
+        with db_session:
+            self.news.telegram_news_id_edit = message.message_id
+            self.news.save(db_session,
+                           identifier_to_value=[News.news_id == self.news.news_id])
         return True

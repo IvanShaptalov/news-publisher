@@ -9,5 +9,5 @@ from datetime import datetime, timedelta
 
 async def handle_post_news(message: types.Message, state: FSMContext):  # post news
     ic(config.config.POST)
-    await NewsPublisher.publish_event(start_date=datetime.now() - timedelta(days=4),
-                                      end_date=datetime.now() - timedelta(days=3))
+    await NewsPublisher.publish_event(start_date=datetime.now() - timedelta(days=1),
+                                      end_date=datetime.now() + timedelta(days=1))

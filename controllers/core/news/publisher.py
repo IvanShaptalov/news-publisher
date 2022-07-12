@@ -2,7 +2,7 @@ from database.models import News
 from database.core import db_session
 from datetime import datetime, timedelta
 from config.config import GROUP_EDIT_ID, GROUP_MAIN_ID
-from .messenger import BaseNewsSender
+from .messenger import BaseNewsSender, EditingNewsSender
 
 
 class NewsPublisher:
@@ -30,7 +30,13 @@ class NewsPublisher:
     def _prepare_news(news_list: list[News]):
         if news_list is None:
             return []
-        return [BaseNewsSender(news) for news in news_list]
+        return [BaseNewsSender(news) if not news.telegram_news_id else None for news in news_list]
+
+    @staticmethod
+    def _prepare_news_to_edit(news_list: list[News]):
+        if news_list is None:
+            return []
+        return [EditingNewsSender(news) if not news.telegram_news_id_edit else None for news in news_list]
 
     @staticmethod
     async def publish_event(start_date=None, end_date=None):
@@ -39,6 +45,9 @@ class NewsPublisher:
 
         # prepare news to send
         prepared_news = NewsPublisher._prepare_news(news_list=raw_news)
+        prepared_news_to_edit = NewsPublisher._prepare_news_to_edit(news_list=raw_news)
 
         # post news in main group
+        # todonext only 1 post
         await BaseNewsSender.bulk_post_news(news_list=prepared_news, group_chat_id=GROUP_MAIN_ID)
+        await EditingNewsSender.bulk_post_news(news_list=prepared_news_to_edit, group_chat_id=GROUP_EDIT_ID)

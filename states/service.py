@@ -2,5 +2,5 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class StatesGroup(StatesGroup):
-    main_menu = State()
-    in_chat = State()
+    edit_state = State()
+    text_entered_state = State()

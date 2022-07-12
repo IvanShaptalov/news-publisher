@@ -63,3 +63,5 @@ POST = '/post'
 class ScrapURLS:
     OSVITA_URL = 'https://osvita.ua/news/'
     NUSORGUA_URL = 'https://nus.org.ua/news/'
+
+
