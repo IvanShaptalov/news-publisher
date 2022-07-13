@@ -102,7 +102,7 @@ class OsvitaParser(Parser):
                                  news_link=news_item.get('href'),
                                  date=news_item.get('time'),
                                  telegram_news_id='')
-                news_item.save(db_session)
+                news_item.save(db_session, override=False)
         print('saved')
         return r_news
 
@@ -189,6 +189,6 @@ class NusOrgUaParser(Parser):
                                  news_link=news_item.get('href'),
                                  date=news_item.get('time'),
                                  telegram_news_id='')
-                news_item.save(db_session)
+                news_item.save(db_session, override=False)
         print('saved')
         return r_news

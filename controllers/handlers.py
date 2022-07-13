@@ -25,10 +25,7 @@ def setup(dp: Dispatcher):
                                        lambda callback: text_util.DELETE_POST in callback.data,
                                        state='*')
 
-    dp.register_message_handler(edit_news.handle_text_entered_reply, content_types=['text'], state=StatesGroup.edit_state)
+    dp.register_message_handler(edit_news.handle_text_entered_reply, content_types=['text'], state=StatesGroup.text_entered_state)
 
-    dp.register_message_handler(edit_news.handle_cancel_reply, Text(equals=text_util.CANCEL_EDITING), state=StatesGroup.text_entered_state)
-
-    dp.register_message_handler(edit_news.handle_save_reply, Text(equals=text_util.SAVE_POST), state=StatesGroup.text_entered_state)
     # endregion text editing
 

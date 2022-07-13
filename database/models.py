@@ -1,5 +1,6 @@
 import datetime
 
+from aiogram import Bot
 from icecream import ic
 from sqlalchemy import Column, String, DateTime
 
@@ -28,8 +29,8 @@ class News(Base):
     source_link = Column('source_link', String, unique=False)
     news_link = Column('news_link', String, unique=False)
     date = Column('date', DateTime, unique=False, nullable=True)
-    telegram_news_id = Column('telegram_news_id', String, unique=False, default='_')
-    telegram_news_id_edit = Column('telegram_news_id_edit', String, unique=False, default='_')
+    telegram_news_id = Column('telegram_news_id', String, unique=False, nullable=True)
+    telegram_news_id_edit = Column('telegram_news_id_edit', String, unique=False, nullable=True)
 
     attrs_to_save = ('news_id',
                      'text',
@@ -62,14 +63,26 @@ class News(Base):
                 result[attr] = self.__getattribute__(attr).strftime(config.TIME_FORMAT)
         return result
 
-    def save(self, open_session, identifier_to_value=None):
+    def save(self, open_session, identifier_to_value=None, override=True):
         if identifier_to_value is None:
             identifier_to_value = [News.news_link == self.news_link]
         print('write')
         write_obj_to_table(open_session=open_session,
                            table_class=News,
                            identifier_to_value=identifier_to_value,
+                           override=override,
                            **self.to_dict())
+
+    @staticmethod
+    async def delete_message(message_id, chat_id, bot):
+        assert isinstance(bot, Bot)
+        await bot.delete_message(message_id=message_id, chat_id=chat_id)
+        return True
+
+    @staticmethod
+    async def edit_message(message_id, chat_id, text, bot):
+        assert isinstance(bot, Bot)
+        await bot.edit_message_text(message_id=message_id, chat_id=chat_id, text=text)
 
     def delete(self, open_session):
         try:
@@ -94,4 +107,3 @@ def drop_tables(c_engine):
     Base.metadata.drop_all(bind=c_engine)
     ic('tables deleted')
     return True
-

@@ -82,7 +82,8 @@ def get_from_db_multiple_filter(table_class, open_session, identifier_to_value: 
 # region abstract write
 
 @db_error_handler
-def write_obj_to_table(open_session, table_class, identifier_to_value: List = None, **column_name_to_value):
+def write_obj_to_table(open_session, table_class, identifier_to_value: List = None, override=True,
+                       **column_name_to_value):
     """column name to value must be exist in table class in columns"""
     # get obj
     assert isinstance(identifier_to_value, List)
@@ -103,7 +104,10 @@ def write_obj_to_table(open_session, table_class, identifier_to_value: List = No
         open_session.add(tab_obj)
     # else just update
     print('commit {0}'.format(tab_obj))
-    open_session.commit()
+    if is_new:
+        open_session.commit()
+    if not is_new and override:
+        open_session.commit()
     return tab_obj
 
 
