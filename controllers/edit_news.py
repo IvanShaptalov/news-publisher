@@ -5,6 +5,7 @@ from aiogram.dispatcher import FSMContext
 from icecream import ic
 
 import config.config
+import keyboards.reply
 import utils
 from config import text_util
 from config.bot_setup import bot
@@ -15,6 +16,8 @@ from states.service import StatesGroup
 
 
 async def handle_start(message: types.Message, state=None):
+    if state:
+        await state.finish()
     ic(START)
     ic(message.chat.id)
     await message.reply(text_util.MAIN_MENU_OPENED)
@@ -24,6 +27,8 @@ async def handle_start(message: types.Message, state=None):
 
 
 async def handle_delete_callback(callback: types.CallbackQuery, state: FSMContext):
+    if state:
+        await state.finish()
     id = utils.get_id_from_data(callback.data, 1)
     if id == 'button expired':
         await callback.message.reply(text=id)
@@ -38,9 +43,6 @@ async def handle_delete_callback(callback: types.CallbackQuery, state: FSMContex
             if post.telegram_news_id_edit:
                 await post.delete_message(message_id=post.telegram_news_id_edit, chat_id=config.config.GROUP_EDIT_ID,
                                           bot=bot)
-
-    if state:
-        await state.finish()
 
 
 async def handle_edit_callback(callback: types.CallbackQuery, state: FSMContext):
@@ -61,9 +63,10 @@ async def handle_text_entered_reply(message: types.Message, state: FSMContext):
         await state.update_data(text=message.text)
 
         await bot.send_message(chat_id=message.chat.id,
-                               text='type "save" (without quotes) to save post')
+                               text='click "save" to save post, or enter other text',
+                               reply_markup=keyboards.reply.save())
 
-    if message.text.lower() == 'save':
+    if 'save' in message.text.lower():
         with db_session:
             async with state.proxy() as data:
                 post_id = data['id']
@@ -71,12 +74,21 @@ async def handle_text_entered_reply(message: types.Message, state: FSMContext):
                 post = News.get_from_db(news_id=post_id, open_session=db_session)
                 if isinstance(post, News):
                     if post.telegram_news_id:
-                        await post.edit_message(message_id=post.telegram_news_id, chat_id=config.config.GROUP_MAIN_ID,
-                                                bot=bot, text=text)
+                        await post.edit_message(message_id=post.telegram_news_id,
+                                                chat_id=config.config.GROUP_MAIN_ID,
+                                                bot=bot,
+                                                text=text.replace('*POST TO EDITING*', ''),
+                                                edit=False)
 
                     if post.telegram_news_id_edit:
                         await post.edit_message(message_id=post.telegram_news_id_edit,
-                                                chat_id=config.config.GROUP_EDIT_ID, bot=bot, text=text)
+                                                chat_id=config.config.GROUP_EDIT_ID,
+                                                bot=bot,
+                                                text='*POST TO EDITING*\n'+text,
+                                                edit=True)
 
                 if state:
                     await state.finish()
+
+                await bot.send_message(chat_id=config.config.GROUP_EDIT_ID,
+                                       text='post edited')

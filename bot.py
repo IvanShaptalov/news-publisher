@@ -22,6 +22,7 @@ def parse_news():
 
 
 if __name__ == '__main__':
+    ic('parse starting')
     parse_news()
     handlers.setup(dispatcher)
     executor.start_polling(dispatcher, skip_updates=True)

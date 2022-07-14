@@ -4,6 +4,7 @@ from aiogram import Bot
 from icecream import ic
 from sqlalchemy import Column, String, DateTime
 
+import keyboards.inline
 from config import config
 from database import db_methods
 from database.core import Base
@@ -79,10 +80,15 @@ class News(Base):
         await bot.delete_message(message_id=message_id, chat_id=chat_id)
         return True
 
-    @staticmethod
-    async def edit_message(message_id, chat_id, text, bot):
+    async def edit_message(self, message_id, chat_id, text, bot, edit=False):
         assert isinstance(bot, Bot)
-        await bot.edit_message_text(message_id=message_id, chat_id=chat_id, text=text)
+        markup = None
+        if edit:
+            markup = keyboards.inline.editing_post_inline_keyboard(self.news_id)
+        await bot.edit_message_text(message_id=message_id,
+                                    chat_id=chat_id,
+                                    text=text,
+                                    reply_markup=markup)
 
     def delete(self, open_session):
         try:

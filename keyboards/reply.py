@@ -1,10 +1,12 @@
 # reply
 from aiogram import types
 
-
-def default_reply_markup(resize_keyboard=True, selective=True) -> types.ReplyKeyboardMarkup:
-    return types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+from config.text_util import SAVE_POST
 
 
 def remove() -> types.ReplyKeyboardRemove:
     return types.ReplyKeyboardRemove()
+
+
+def save():
+    return types.ReplyKeyboardMarkup(one_time_keyboard=True, resize_keyboard=True).add(SAVE_POST)
