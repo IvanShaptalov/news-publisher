@@ -1,11 +1,11 @@
 # inline keyboard
-EDIT_POST = 'edit'
-DELETE_POST = 'delete'
+EDIT_POST = '✏️'
+DELETE_POST = '❌'
 
 
 # reply keyboard
 TEXT_ENTERED = 'text entered'
-SAVE_POST = 'save'
+SAVE_POST = '✅'
 CANCEL_EDITING = 'cancel'
 
 
