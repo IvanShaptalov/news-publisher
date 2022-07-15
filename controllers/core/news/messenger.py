@@ -1,8 +1,5 @@
-from aiogram.types import ParseMode
-
 import config.config
 import keyboards
-from config import text_util
 from config.bot_setup import bot
 from database.core import db_session
 from database.models import News
@@ -31,16 +28,14 @@ class BaseNewsSender:
         return '{0}\n\n' \
                '{1}\n' \
                '{2}\n\n' \
-               '<a href="{3}">{4}</a> \n'.format(self.source_title,
-                                                 self.date.strftime(config.config.TIME_FORMAT),
-                                                 self.text,
-                                                 self.news_link,
-                                                 text_util.SOURCE_LINK)
+               '{3}\n'.format(self.source_title,
+                              self.date.strftime(config.config.TIME_FORMAT),
+                              self.text,
+                              self.news_link)
 
     async def post_news(self, group_chat_id):
         message = await bot.send_message(chat_id=group_chat_id,
-                                         text=self.prepare_text(),
-                                         parse_mode=ParseMode.HTML)
+                                         text=self.prepare_text())
 
         with db_session:
             self.news.telegram_news_id = message.message_id
@@ -72,17 +67,15 @@ class EditingNewsSender(BaseNewsSender):
         return '*POST TO EDITING*\n{0}\n\n' \
                '{1}\n' \
                '{2}\n\n' \
-               '<a href="{3}">{4}</a> \n'.format(self.source_title,
-                                                 self.date.strftime(config.config.TIME_FORMAT),
-                                                 self.text,
-                                                 self.news_link,
-                                                 text_util.SOURCE_LINK)
+               '{3}\n'.format(self.source_title,
+                              self.date.strftime(config.config.TIME_FORMAT),
+                              self.text,
+                              self.news_link)
 
     async def post_news(self, group_chat_id):
         message = await bot.send_message(chat_id=group_chat_id,
                                          text=self.prepare_text(),
-                                         reply_markup=keyboards.inline.editing_post_inline_keyboard(self.news_id),
-                                         parse_mode=ParseMode.HTML)
+                                         reply_markup=keyboards.inline.editing_post_inline_keyboard(self.news_id))
 
         with db_session:
             self.news.telegram_news_id_edit = message.message_id

@@ -5,7 +5,7 @@ DELETE_POST = '❌'
 
 # reply keyboard
 TEXT_ENTERED = 'text entered'
-SAVE_POST = '✅'
+SAVE_POST = '✅ save'
 CANCEL_EDITING = 'cancel'
 
 
