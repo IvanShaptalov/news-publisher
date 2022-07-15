@@ -11,7 +11,11 @@ from .core.scrapper.scrapper import parse_news
 counter = 0
 
 
-async def handle_post_news(message: types.Message, state: FSMContext):  # post news
+async def handle_post_news(message: types.Message, state: FSMContext):  # post
+    if str(message.chat.id) != str(config.config.GROUP_EDIT_ID):
+        ic('post not from edit group')
+        return
+    # news
     global counter
     ic(config.config.POST)
     if counter == 3:
