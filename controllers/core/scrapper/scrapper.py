@@ -3,6 +3,7 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 import requests
 from bs4 import BeautifulSoup, Tag
+from icecream import ic
 from requests import Response
 
 from config.config import ScrapURLS as SL, TIME_FORMAT_NUSORGUA, TIME_FORMAT_OSVITA
@@ -25,7 +26,7 @@ class Parser(ABC):
         pass
 
     def _get_html_doc(self, url) -> Response:
-        self._page = requests.get(url)
+        self._page = requests.get(url, timeout=6)
         return self._page
 
     def _soup_from_page(self, url=None) -> BeautifulSoup:
@@ -192,3 +193,18 @@ class NusOrgUaParser(Parser):
                 news_item.save(db_session, override=False)
         print('saved')
         return r_news
+
+
+def parse_news():
+    try:
+        nus = NusOrgUaParser()
+        nus.get_news()
+        nus.save_news()
+        ic('nus news saved')
+
+        osvita = OsvitaParser()
+        osvita.get_news()
+        osvita.save_news()
+        ic('osvita news saved')
+    except Exception as e:
+        print(e)

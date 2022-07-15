@@ -30,16 +30,16 @@ class NewsPublisher:
     def _prepare_news(news_list: list[News]):
         if news_list is None:
             return []
-        return [BaseNewsSender(news) if not news.telegram_news_id else None for news in news_list]
+        return [BaseNewsSender(news) for news in news_list if not news.telegram_news_id]
 
     @staticmethod
     def _prepare_news_to_edit(news_list: list[News]):
         if news_list is None:
             return []
-        return [EditingNewsSender(news) if not news.telegram_news_id_edit else None for news in news_list]
+        return [EditingNewsSender(news) for news in news_list if not news.telegram_news_id_edit]
 
     @staticmethod
-    async def publish_event(start_date=None, end_date=None):
+    async def publish_event(start_date=None, end_date=None, count: int = None):
         # get news from database
         raw_news = NewsPublisher._get_news(start_date=start_date, end_date=end_date)
 
@@ -49,5 +49,5 @@ class NewsPublisher:
 
         # post news in main group
         # todonext only 1 post
-        await BaseNewsSender.bulk_post_news(news_list=prepared_news, group_chat_id=GROUP_MAIN_ID)
-        await EditingNewsSender.bulk_post_news(news_list=prepared_news_to_edit, group_chat_id=GROUP_EDIT_ID)
+        await BaseNewsSender.bulk_post_news(news_list=prepared_news, group_chat_id=GROUP_MAIN_ID, count=count)
+        await EditingNewsSender.bulk_post_news(news_list=prepared_news_to_edit, group_chat_id=GROUP_EDIT_ID, count=count)
