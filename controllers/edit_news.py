@@ -58,7 +58,7 @@ async def handle_edit_callback(callback: types.CallbackQuery, state: FSMContext)
 
 
 async def handle_text_entered_reply(message: types.Message, state: FSMContext):
-    if message.text.lower() != 'save':
+    if 'save' not in message.text.lower():
         await StatesGroup.text_entered_state.set()
         await state.update_data(text=message.text)
 
