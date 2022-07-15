@@ -12,7 +12,7 @@ settings.read(os.path.join(base_dir, "config.ini"))
 
 def database_link(test=False):
     if test:
-        pre_database_url = os.environ.get('HEROKU_POSTGRESQL_AMBER_URL') or settings['DATABASE']['TEST_URL']
+        pre_database_url = os.environ.get('HEROKU_POSTGRESQL_ONYX_URL') or settings['DATABASE']['TEST_URL']
     else:
         pre_database_url = os.environ.get('DATABASE_URL') or settings['DATABASE']['URL']
     print(pre_database_url.replace(pre_database_url[pre_database_url.index('//'):pre_database_url.index('@')], '*' * 3))
