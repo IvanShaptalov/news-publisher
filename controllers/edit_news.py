@@ -26,6 +26,14 @@ async def handle_start(message: types.Message, state=None):
         logging.info('leave chat, chat state finish')
 
 
+async def handle_connect(message: types.Message, state=None):
+    ic('handle connect')
+    if state:
+        await state.finish()
+    ic('channel id')
+    ic(message.chat.id)
+
+
 async def handle_delete_callback(callback: types.CallbackQuery, state: FSMContext):
     if state:
         await state.finish()
@@ -84,7 +92,7 @@ async def handle_text_entered_reply(message: types.Message, state: FSMContext):
                         await post.edit_message(message_id=post.telegram_news_id_edit,
                                                 chat_id=config.config.GROUP_EDIT_ID,
                                                 bot=bot,
-                                                text='*POST TO EDITING*\n'+text,
+                                                text='*POST TO EDITING*\n' + text,
                                                 edit=True)
 
                 if state:
